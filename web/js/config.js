@@ -13,26 +13,9 @@ var CONFIG = {
   //      'https://www.youtube.com/@tenkenh'          (dán nguyên link kênh)
   //    Muốn bỏ kênh nào: thêm // ở đầu dòng đó.
   CHANNELS: [
-    // ---- Tiếng Việt ----
-    'UCZ0GRZ-ZLXQZPxEl1rRNZYg', // BIBI - Kênh Thiếu nhi VTVcab: hoạt hình, ca nhạc
-    'UCuKIDy20OrxaPDwDI3pt5KQ', // NiDo Channel (Báo Nhi Đồng TP.HCM): hát, thủ công, thí nghiệm, truyện
-    '@THVLThieuNhi',            // THVL Thiếu Nhi: truyện cổ tích, văn học hoạt hình
-    '@VTVCaNhacThieuNhi',       // VTV - Ca Nhạc Thiếu Nhi: bài hát thiếu nhi Việt Nam
-    'UCSdw4QHWYHi0tsoLUHUXRNg', // Pinkfong tiếng Việt (2-5 tuổi): bài hát
-    'UCA7QBnEDwHAEFTQpaNDT5Iw', // BabyBus tiếng Việt (2-5 tuổi): thói quen tốt, an toàn
-    'UCas-IR8aZTS5pprhydlDygw', // Little Angel tiếng Việt (2-5 tuổi): bài hát, sinh hoạt hằng ngày
-
-    // ---- Tiếng Anh (học tiếng Anh) ----
-    'UCLsooMJoIpl_7ux2jvdPB-Q', // Super Simple Songs (2-6 tuổi): bài hát tiếng Anh nhẹ nhàng
-    'UCG2CL6EUjG8TVT1Tpl9nJdg', // Ms Rachel (1-4 tuổi): tập nói, học từ
-    'UCoookXUzPciGrEZEXmh4Jjg', // Sesame Street (2-6 tuổi)
-    'UCPlwvN0w4qFSP1FllALB92w', // Numberblocks (3-7 tuổi): học đếm, làm toán
-    'UC_qs3c0ehDvZkbiEbOj6Drg', // Alphablocks (3-7 tuổi): học chữ, đánh vần
-    'UCAOtE1V7Ots4DjM8JLlrYgg', // Peppa Pig (2-6 tuổi)
-    'UCVzLLZkDuFGAE2BGdBuBNBg', // Bluey (3-8 tuổi)
-    'UC5uIZ2KOZZeQDQo_Gsi_qbQ', // Cosmic Kids Yoga (3-8 tuổi): yoga, vận động
-    'UC5XMF3Inoi8R9nSI8ChOsdQ', // Art for Kids Hub (4-10 tuổi): hướng dẫn vẽ
-    'UCRFIPG2u1DxKLNuE3y2SjHA', // SciShow Kids (5-10 tuổi): khoa học
+    'https://www.youtube.com/@doremi5g',
+    'https://www.youtube.com/@chunchin-chillcungbeiu1450',
+    'https://www.youtube.com/@SheriffLabradorVN'
   ],
 
   // 3) Video lẻ được phép (từ kênh không nằm trong danh sách) — hiện ở tab "Chọn lọc".
