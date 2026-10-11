@@ -1,0 +1,13 @@
+{
+  "id": "com.giadinh.kidstube",
+  "version": "1.0.0",
+  "vendor": "Gia dinh",
+  "type": "web",
+  "main": "index.html",
+  "title": "Kids Tube",
+  "icon": "icon.png",
+  "largeIcon": "largeIcon.png",
+  "bgColor": "#0f1724",
+  "resolution": "1920x1080",
+  "disableBackHistoryAPI": true
+}

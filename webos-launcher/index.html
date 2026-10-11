@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <title>Kids Tube</title>
+  <style>
+    html, body { margin: 0; height: 100%; background: #0f1724; color: #fff; font-family: Arial, sans-serif; }
+    #msg { position: absolute; top: 42%; left: 10%; right: 10%; text-align: center; font-size: 38px; line-height: 56px; white-space: pre-line; }
+  </style>
+</head>
+<body>
+  <div id="msg">Đang mở Kids Tube…</div>
+  <script>
+    // ĐỔI DÒNG NÀY thành địa chỉ GitHub Pages của bạn (có dấu / ở cuối)
+    var APP_URL = 'https://TEN-GITHUB-CUA-BAN.github.io/kidstube/';
+
+    function show(text) { document.getElementById('msg').textContent = text; }
+
+    document.addEventListener('keydown', function (e) {
+      if (e.keyCode === 13) location.reload();          // OK: thử lại
+      if (e.keyCode === 461 || e.keyCode === 8) window.close(); // Quay lại: thoát
+    }, false);
+
+    if (APP_URL.indexOf('TEN-GITHUB-CUA-BAN') !== -1) {
+      show('Chưa sửa APP_URL trong webos-launcher/index.html');
+    } else if (navigator.onLine === false) {
+      show('TV chưa kết nối mạng.\nNhấn OK để thử lại.');
+    } else {
+      window.location.replace(APP_URL);
+    }
+  </script>
+</body>
+</html>
