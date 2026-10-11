@@ -15,13 +15,15 @@ var CONFIG = {
   CHANNELS: [
     'https://www.youtube.com/@doremi5g',
     'https://www.youtube.com/@chunchin-chillcungbeiu1450',
-    'https://www.youtube.com/@SheriffLabradorVN'
+    'https://www.youtube.com/@SheriffLabradorVN',
+    'https://www.youtube.com/@TinyWrist'
   ],
 
   // 3) Video lẻ được phép (từ kênh không nằm trong danh sách) — hiện ở tab "Chọn lọc".
   //    Ghi ID 11 ký tự hoặc dán nguyên link video.
   ALLOWED_VIDEOS: [
-    // 'https://www.youtube.com/watch?v=XXXXXXXXXXX',
+    'https://www.youtube.com/watch?v=sNFp_KRhLE0',
+    'https://www.youtube.com/watch?v=_hGZUNKoE7I'
   ],
 
   // 4) Chặn riêng từng video (kể cả khi nằm trong kênh được phép).
