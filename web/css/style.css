@@ -37,7 +37,9 @@ header {
 .logo {
   font-size: 44px;
   font-weight: bold;
-  color: #ffd166;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #ffffff;
+  letter-spacing: -0.6px;
   white-space: nowrap;
   margin-right: 50px;
 }
@@ -45,20 +47,21 @@ header {
 .logo-play {
   display: inline-block;
   vertical-align: middle;
-  width: 56px;
-  height: 40px;
-  margin: -6px 16px 0 0;
-  border-radius: 12px;
-  background: #2a9d8f;
+  width: 62px;
+  height: 44px;
+  margin: -8px 14px 0 0;
+  border-radius: 14px;
+  background: #ff0000;
   position: relative;
 }
 .logo-play:after {
   content: "";
   position: absolute;
-  left: 22px; top: 10px;
-  border-left: 16px solid #fff;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
+  left: 25px;
+  top: 13px;
+  border-left: 18px solid #fff;
+  border-top: 9px solid transparent;
+  border-bottom: 9px solid transparent;
 }
 
 #tabs {
