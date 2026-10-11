@@ -18,9 +18,10 @@
 
   var els = {};
   var state = {
-    tabs: [], tabIndex: 0, area: 'tabs', cardIndex: 0,
-    loading: true, error: null, locked: false, lastBackAt: 0
+    tabs: [], allVideos: [], channelThumbs: {}, tabIndex: 0, area: 'tabs', cardIndex: 0,
+    query: '', loading: true, error: null, locked: false, lastBackAt: 0
   };
+  var view = { key: '', list: [] };
   var player = null;
   var ytReady = false;
   var pendingVideoId = null;
@@ -33,6 +34,8 @@
   function init() {
     els.app = $('app');
     els.tabs = $('tabs');
+    els.search = $('search');
+    els.searchInput = $('search-input');
     els.grid = $('grid');
     els.status = $('status');
     els.toast = $('toast');
@@ -47,6 +50,11 @@
     els.playerMsg = $('player-msg');
 
     document.addEventListener('keydown', onKeyDown, false);
+    els.searchInput.addEventListener('input', onSearchInput, false);
+    els.searchInput.addEventListener('focus', function () {
+      state.area = 'search';
+      updateFocus(false);
+    }, false);
     bindPointer();
     document.addEventListener('visibilitychange', function () {
       if (document.hidden && playback.active && player && player.pauseVideo) player.pauseVideo();
@@ -62,6 +70,10 @@
     state.loading = true;
     state.error = null;
     state.tabs = [];
+    state.allVideos = [];
+    state.query = '';
+    view.key = '';
+    if (els.searchInput) els.searchInput.value = '';
     els.tabs.innerHTML = '';
     els.grid.innerHTML = '';
 
@@ -112,21 +124,69 @@
 
   function buildTabs(lib) {
     var tabs = [];
+    var seen = {};
     var all = [];
-    lib.channels.forEach(function (ch) { all = all.concat(ch.videos); });
+    var thumbs = {};
+    function add(v) {
+      if (!v || seen[v.id]) return;
+      seen[v.id] = true;
+      all.push(v);
+    }
+    lib.channels.forEach(function (ch) {
+      thumbs[ch.title] = ch.thumb;
+      ch.videos.forEach(add);
+    });
+    (lib.picks || []).forEach(add);
     all.sort(function (a, b) {
       return a.publishedAt < b.publishedAt ? 1 : (a.publishedAt > b.publishedAt ? -1 : 0);
     });
+    state.allVideos = all;
+    state.channelThumbs = thumbs;
     var nonEmpty = lib.channels.filter(function (ch) { return ch.videos.length > 0; });
     if (nonEmpty.length > 1) tabs.push({ title: 'Tất cả', videos: all.slice(0, ALL_TAB_LIMIT) });
     nonEmpty.forEach(function (ch) { tabs.push({ title: ch.title, thumb: ch.thumb, videos: ch.videos }); });
     if (lib.picks && lib.picks.length) tabs.push({ title: 'Chọn lọc', videos: lib.picks });
     state.tabs = tabs;
+    view.key = '';
   }
 
+  function fold(s) {
+    var t = String(s || '').toLowerCase();
+    if (t.normalize) t = t.normalize('NFD');
+    return t.replace(/[̀-ͯ]/g, '').replace(/đ/g, 'd').replace(/^\s+|\s+$/g, '');
+  }
+
+  function queryKey() { return fold(state.query); }
+
+  // Chỉ lọc video đã tải từ kênh được phép. Không gọi API tìm kiếm của YouTube.
   function currentVideos() {
-    var t = state.tabs[state.tabIndex];
-    return t ? t.videos : [];
+    var q = queryKey();
+    var key = q ? ('q:' + q) : ('t:' + state.tabIndex);
+    if (view.key === key) return view.list;
+    view.key = key;
+    if (!q) {
+      var t = state.tabs[state.tabIndex];
+      view.list = t ? t.videos : [];
+      return view.list;
+    }
+    var parts = q.split(/\s+/);
+    view.list = state.allVideos.filter(function (v) {
+      var hay = fold(v.title + ' ' + v.channelTitle);
+      for (var i = 0; i < parts.length; i++) {
+        if (parts[i] && hay.indexOf(parts[i]) === -1) return false;
+      }
+      return true;
+    });
+    return view.list;
+  }
+
+  function onSearchInput() {
+    state.query = els.searchInput.value;
+    view.key = '';
+    state.cardIndex = 0;
+    renderGrid();
+    if (state.area === 'grid' && !currentVideos().length) state.area = 'search';
+    if (state.area !== 'search') updateFocus(false);
   }
 
   /* ======================= Vẽ giao diện ======================= */
@@ -157,6 +217,13 @@
     var videos = currentVideos();
     els.grid.innerHTML = '';
     els.grid.scrollTop = 0;
+    if (!videos.length) {
+      var empty = document.createElement('div');
+      empty.className = 'empty';
+      empty.textContent = queryKey() ? 'Không tìm thấy video nào' : 'Không có video nào';
+      els.grid.appendChild(empty);
+      return;
+    }
     var frag = document.createDocumentFragment();
     videos.forEach(function (v, i) {
       var card = document.createElement('div');
@@ -178,15 +245,26 @@
       }
       card.appendChild(thumb);
 
+      var info = document.createElement('div');
+      info.className = 'cinfo';
+      var avatarUrl = state.channelThumbs[v.channelTitle];
+      if (avatarUrl) {
+        var avatar = document.createElement('img');
+        avatar.className = 'cavatar';
+        avatar.alt = '';
+        avatar.src = avatarUrl;
+        avatar.onerror = function () { this.style.display = 'none'; };
+        info.appendChild(avatar);
+      }
       var title = document.createElement('div');
       title.className = 'ctitle';
       title.textContent = v.title;
-      card.appendChild(title);
-
+      info.appendChild(title);
       var meta = document.createElement('div');
       meta.className = 'cmeta';
       meta.textContent = v.channelTitle;
-      card.appendChild(meta);
+      info.appendChild(meta);
+      card.appendChild(info);
 
       frag.appendChild(card);
     });
@@ -198,13 +276,15 @@
     var old = document.querySelectorAll('.focused');
     for (var i = 0; i < old.length; i++) old[i].classList.remove('focused');
 
+    if (els.search) els.search.classList.toggle('focused', state.area === 'search');
+
     if (state.area === 'tabs') {
       var tab = els.tabs.children[state.tabIndex];
       if (tab) {
         tab.classList.add('focused');
         if (scroll !== false) ensureTabVisible(tab);
       }
-    } else {
+    } else if (state.area === 'grid') {
       var card = els.grid.children[state.cardIndex];
       if (card) {
         card.classList.add('focused');
@@ -225,13 +305,15 @@
   }
 
   function ensureTabVisible(tab) {
-    var t = els.tabs, pad = 60;
-    var left = tab.offsetLeft, right = left + tab.offsetWidth;
-    if (left - pad < t.scrollLeft) {
-      t.scrollLeft = Math.max(0, left - pad);
-    } else if (right + pad > t.scrollLeft + t.clientWidth) {
-      t.scrollLeft = right + pad - t.clientWidth;
+    var t = els.tabs, pad = 12;
+    var tabRect = tab.getBoundingClientRect();
+    var box = t.getBoundingClientRect();
+    if (tabRect.left < box.left + pad) {
+      t.scrollLeft -= (box.left + pad - tabRect.left);
+    } else if (tabRect.right > box.right - pad) {
+      t.scrollLeft += (tabRect.right - (box.right - pad));
     }
+    if (t.scrollLeft < 0) t.scrollLeft = 0;
   }
 
   // Chỉ tải ảnh thu nhỏ của những thẻ gần màn hình (đỡ nặng cho TV)
@@ -248,11 +330,27 @@
     }
   }
 
+  function markActiveTab() {
+    var kids = els.tabs.children;
+    for (var i = 0; i < kids.length; i++) {
+      if (i === state.tabIndex) kids[i].classList.add('active');
+      else kids[i].classList.remove('active');
+    }
+  }
+
   function selectTab(i) {
-    if (i < 0 || i >= state.tabs.length || i === state.tabIndex) return;
+    if (i < 0 || i >= state.tabs.length) return;
+    var same = i === state.tabIndex;
+    var hadQuery = !!queryKey();
+    if (same && !hadQuery) return;
     state.tabIndex = i;
     state.cardIndex = 0;
-    renderTabs();
+    if (hadQuery) {
+      state.query = '';
+      els.searchInput.value = '';
+    }
+    view.key = '';
+    markActiveTab();
     renderGrid();
   }
 
@@ -260,6 +358,16 @@
 
   function onKeyDown(e) {
     var code = e.keyCode;
+    if (!playback.active && document.activeElement === els.searchInput) {
+      // Phím Backspace phải xóa chữ. Chỉ nút Quay lại / Esc mới thoát ô tìm kiếm.
+      if (code === KEY.BACK || code === KEY.ESC) {
+        e.preventDefault();
+        els.searchInput.blur();
+        state.area = 'search';
+        updateFocus(false);
+      }
+      return;
+    }
     var handled = playback.active ? playerKey(code) : homeKey(code);
     if (handled) {
       e.preventDefault();
@@ -293,9 +401,29 @@
 
     var n = currentVideos().length;
 
+    if (state.area === 'search') {
+      if (code === KEY.DOWN) state.area = 'tabs';
+      else if (code === KEY.ENTER) {
+        els.searchInput.focus();
+        return true;
+      } else if (isBack(code)) {
+        if (state.query) {
+          state.query = '';
+          els.searchInput.value = '';
+          view.key = '';
+          state.cardIndex = 0;
+          renderGrid();
+        } else askExit();
+        return true;
+      } else return true;
+      updateFocus();
+      return true;
+    }
+
     if (state.area === 'tabs') {
       if (code === KEY.LEFT) selectTab(state.tabIndex - 1);
       else if (code === KEY.RIGHT) selectTab(state.tabIndex + 1);
+      else if (code === KEY.UP) state.area = 'search';
       else if ((code === KEY.DOWN || code === KEY.ENTER) && n) {
         state.area = 'grid';
         state.cardIndex = Math.min(state.cardIndex, n - 1);
@@ -371,6 +499,13 @@
     els.grid.addEventListener('click', function (e) {
       var card = findIndexed(e.target, els.grid, 'card');
       if (card) playFrom(currentVideos(), +card.getAttribute('data-index'));
+    }, false);
+
+    els.search.addEventListener('click', function () {
+      if (state.loading || state.error || state.locked) return;
+      state.area = 'search';
+      updateFocus(false);
+      els.searchInput.focus();
     }, false);
 
     els.tabs.addEventListener('click', function (e) {

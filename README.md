@@ -1,7 +1,7 @@
 # Kids Tube — YouTube an toàn cho bé trên TV LG webOS
 
-App chỉ hiện video của **những kênh phụ huynh cho phép**. Không có ô tìm kiếm, không có video gợi ý,
-không bấm được ra YouTube bên ngoài.
+App chỉ hiện video của **những kênh phụ huynh cho phép**. Ô tìm kiếm chỉ lọc trong danh sách đó,
+không tìm trên toàn bộ YouTube. Không có video gợi ý, không bấm được ra YouTube bên ngoài.
 
 ## Cách app hoạt động
 
@@ -25,7 +25,7 @@ Chạy từ một trang `https://` sẽ không gặp lỗi này. Lợi ích kèm
 | Lớp bảo vệ | Mô tả |
 |---|---|
 | Danh sách kênh trắng | Chỉ lấy video từ playlist "uploads" của các kênh trong `CHANNELS`, kiểm tra lại `channelId` từng video |
-| Không tìm kiếm | Giao diện không có ô tìm kiếm |
+| Ô tìm kiếm | Chỉ lọc video đã tải từ kênh được phép, không gọi tìm kiếm YouTube |
 | Lớp chắn trên trình phát | Trẻ dùng chuột Magic Remote không bấm được tiêu đề, logo, màn hình kết thúc hay video gợi ý |
 | Hết video → tự sang video kế tiếp *trong danh sách của app* (không để YouTube gợi ý) |
 | Từ khóa cấm | Bỏ video có tiêu đề/tag chứa từ trong `BLOCKED_KEYWORDS` (không phân biệt dấu) |
@@ -129,10 +129,11 @@ và khóa **YouTube**, **Trình duyệt web** bằng mã PIN. Có thể ghim Kid
 
 | Màn hình danh sách | |
 |---|---|
-| ◀ ▶ ở hàng trên | Đổi kênh |
+| ▲ từ hàng kênh | Lên ô tìm kiếm; OK để gõ. Chỉ tìm trong kênh đã chọn |
+| ◀ ▶ ở hàng kênh | Đổi kênh |
 | ▼ / ▲ / ◀ ▶ | Di chuyển giữa các video |
 | OK | Xem video |
-| Quay lại | Lên hàng kênh; nhấn 2 lần để thoát |
+| Quay lại | Xóa từ khóa nếu đang tìm, rồi lên hàng kênh; nhấn 2 lần để thoát |
 | Nút Đỏ | Tải lại danh sách video |
 
 | Khi xem video | |
